@@ -28,7 +28,7 @@ git push -u origin main
 
 | Item | Value |
 |---|---|
-| Repository | `secure-cloud-ops` |
+| Repository | `cloudock` |
 | Default branch | `main` |
 | Remote | `git@github.com:<username>/secure-cloud-ops.git` |
 
