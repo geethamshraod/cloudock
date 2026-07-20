@@ -30,7 +30,7 @@ git push -u origin main
 |---|---|
 | Repository | `cloudock` |
 | Default branch | `main` |
-| Remote | `git@github.com:<username>/secure-cloud-ops.git` |
+| Remote | `git@github.com:geethamshraod/cloudock.git` |
 
 ## 2. GCP Account & Billing Safeguards
 
