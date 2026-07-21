@@ -80,7 +80,7 @@ error.
 - `cloudock-vpc` confirmed, custom mode
 - Exactly 4 firewall rules present: `cloudock-allow-ssh`, `cloudock-allow-https`, `cloudock-deny-all-ingress`, `cloudock-allow-iap-ssh`
 - `cloudock-nat-gateway` shows in the NAT list for `cloudock-nat-router`
-- `cloudock-test-vm` actually reachable via SSH (confirms the `--tags` fix worked)
+- `test-vm` actually reachable via SSH (confirms the `--tags` fix worked)
 
 ## Infrastructure reference
 
