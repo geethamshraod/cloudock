@@ -1,3 +1,5 @@
+# M1 — Custom VPC
+
 Custom-mode VPC with public/private subnets, a default-deny firewall posture with explicit allow rules, and Cloud NAT for private-subnet egress — validated with a throwaway VM.
 **Region:** `asia-southeast1`
 
