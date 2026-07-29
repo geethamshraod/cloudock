@@ -108,3 +108,9 @@ so restricting the source ranges ensures that only trusted Google systems can
 perform these checks instead of allowing general internet access  — without this 
 rule the backend never passes its health check, regardless of whether the site 
 works fine from a browser.
+
+**Verify (browser):** open `http://<webserver-external-ip>` — default
+nginx page should load or obtain the IP with:
+```bash
+gcloud compute instances describe cloudock-webserver --zone=asia-southeast1-b --format="get(networkInterfaces[0].accessConfigs[0].natIP)"
+```
