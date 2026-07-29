@@ -114,3 +114,4 @@ nginx page should load or obtain the IP with:
 ```bash
 gcloud compute instances describe cloudock-webserver --zone=asia-southeast1-b --format="get(networkInterfaces[0].accessConfigs[0].natIP)"
 ```
+
