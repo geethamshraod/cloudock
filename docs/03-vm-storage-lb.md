@@ -1,4 +1,4 @@
-# M2 — VM + Storage + Load Balancer | lifecycle.json
+# M2 — VM + Storage + Load Balancer 
 
 **Goal:** Public-facing nginx VM behind an HTTP Load Balancer with Cloud
 Armor attached, plus a versioned/lifecycle-managed Cloud Storage bucket
