@@ -87,4 +87,24 @@ gcloud compute ssh cloudock-webserver --zone=asia-southeast1-b
 sudo apt-get update && sudo apt-get install -y nginx && sudo systemctl enable nginx && sudo systemctl start nginx
 exit
 ```
+## 2. Firewall — the two rules the original plan was missing
 
+```bash
+gcloud compute firewall-rules create cloudock-allow-http \
+  --network=cloudock-vpc --action=allow --rules=tcp:80 \
+  --source-ranges=0.0.0.0/0 --target-tags=cloudock-web-server
+
+gcloud compute firewall-rules create cloudock-allow-lb-health-check \
+  --network=cloudock-vpc --action=allow --rules=tcp:80 \
+  --source-ranges=130.211.0.0/22,35.191.0.0/16 --target-tags=cloudock-web-server
+```
+**Why:** `cloudock-allow-http` opens the port nginx actually serves on to
+the public internet — this is the intentionally-public part of the
+project, matching the VM's placement in the public subnet.
+`cloudock-allow-lb-health-check` allows Google Cloud Load Balancer health 
+check probes to access the backend VM on TCP port 80. The health checks 
+originate only from Google's fixed IP ranges (130.211.0.0/22 and 35.191.0.0/16),
+so restricting the source ranges ensures that only trusted Google systems can 
+perform these checks instead of allowing general internet access  — without this 
+rule the backend never passes its health check, regardless of whether the site 
+works fine from a browser.
