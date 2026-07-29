@@ -19,11 +19,14 @@ gcloud compute instances create cloudock-webserver \
 ```
 **Why:** `--metadata=ssh-keys=...` injects your public key directly —
 password auth is never enabled, so there's no password to brute-force in
-the first place. `--tags=cloudock-web-server` is what the two new firewall
-rules below (and nothing else) will target — learned from M1 that an
-untagged instance silently doesn't match tag-scoped rules, so this is
-applied at creation this time, not discovered missing later. `--subnet=cloudock-public-subnet` is because public subnet puts the VM closer to the internet 
-whereas private subnet hides the VM and requires another way (Bastion Host) to access it.
+the first place. `--tags=cloudock-web-server` attaches a network tag to 
+the VM at creation time. This tag acts as an identifier for firewall rules. 
+Any firewall rule configured with the target tag cloudock-web-server will 
+apply to this VM. Adding the tag during creation ensures the VM immediately 
+matches the required firewall rules instead of creating the instance first 
+and later troubleshooting why network access is not working. `--subnet=cloudock-public-subnet` 
+is because public subnet puts the VM closer to the internet whereas private subnet hides 
+the VM and requires another way (Bastion Host) to access it.
 
 ```
 WINDOWS COMPUTER
