@@ -125,6 +125,19 @@ gsutil versioning set on gs://cloudock-503009-security-assets
 nano lifecycle.json
 {"rule":[{"action":{"type":"Delete"},"condition":{"age":90}}]}
 ```
+##### Alternate creation of 90 day lifecycle policy
+```
+Open the Google Cloud Console.
+Navigate to Cloud Storage → Buckets.
+Select your bucket.
+Open the Lifecycle tab (or Lifecycle rules, depending on the interface).
+Click Add Rule.
+Choose:
+  Action: Delete object
+  Condition: Age
+  Age: 90 days
+Save the rule.
+```
 ```bash
 gsutil lifecycle set lifecycle.json gs://cloudock-503009-security-assets
 ```
