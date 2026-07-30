@@ -114,4 +114,28 @@ nginx page should load or obtain the IP with:
 ```bash
 gcloud compute instances describe cloudock-webserver --zone=asia-southeast1-b --format="get(networkInterfaces[0].accessConfigs[0].natIP)"
 ```
+## 3. Cloud Storage bucket
 
+```bash
+gsutil mb -b on -l asia-southeast1 gs://cloudock-503009-security-assets
+gsutil versioning set on gs://cloudock-503009-security-assets
+```
+```bash
+#creating lifecycle.json
+nano lifecycle.json
+{"rule":[{"action":{"type":"Delete"},"condition":{"age":90}}]}
+```
+```bash
+gsutil lifecycle set lifecycle.json gs://cloudock-503009-security-assets
+```
+**Why:** The Cloud Storage bucket is created with Uniform Bucket-Level Access
+`-b on` so that access is managed exclusively through IAM, eliminating legacy 
+object-level ACLs and providing a simpler, more secure, and easier-to-audit 
+permission model. Specifying the `asia-southeast1` region ensures that the bucket 
+is located in the same region as the project's other resources, which helps 
+reduce latency and supports data residency requirements. Versioning protects
+against accidental overwrite/delete — old versions stay recoverable. The
+90-day lifecycle rule auto-deletes objects past that age, which controls
+storage cost but is worth a second look if this bucket is ever meant to
+hold anything with a longer retention requirement (audit evidence, etc.)
+— 90 days is a cost decision here, not a compliance one.
