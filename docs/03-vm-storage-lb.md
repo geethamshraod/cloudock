@@ -152,3 +152,23 @@ against accidental overwrite/delete — old versions stay recoverable. The
 storage cost but is worth a second look if this bucket is ever meant to
 hold anything with a longer retention requirement (audit evidence, etc.)
 — 90 days is a cost decision here, not a compliance one.
+The `gsutil lifecycle set` operation reads the JSON configuration, validates its contents, and updates the bucket's lifecycle settings.
+
+## 4. Least-privilege service account
+
+```bash
+gcloud iam service-accounts create cloudock-storage-writer --display-name="Storage Writer SA"
+
+gcloud projects add-iam-policy-binding cloudock-503009 --member=serviceAccount:cloudock-storage-writer@cloudock-503009.iam.gserviceaccount.com --role=roles/storage.objectCreator
+```
+**Why:** The `gcloud projects add-iam-policy-binding` command updates 
+the project's IAM policy by adding a new role binding. 
+`--member=serviceAccount:cloudock-storage-writer@cloudock-503009.iam.gserviceaccount.com`
+identifies the service account receiving the permission, and 
+`--role=roles/storage.objectCreator` assigns the Storage Object Creator role.
+`roles/storage.objectCreator` allows writing *new* objects only —
+it cannot read, list, overwrite, or delete existing objects. That's
+deliberately narrower than `objectAdmin`: a compromised credential for
+this service account can add data but can't exfiltrate or destroy what's
+already there. This is the same least-privilege principle as the SSH
+firewall rule in M1, applied to IAM instead of network.
