@@ -172,3 +172,13 @@ deliberately narrower than `objectAdmin`: a compromised credential for
 this service account can add data but can't exfiltrate or destroy what's
 already there. This is the same least-privilege principle as the SSH
 firewall rule in M1, applied to IAM instead of network.
+
+## 4. Least-privilege service account
+
+```bash
+gcloud iam service-accounts create cloudock-storage-writer --display-name="Storage Writer SA"
+
+gcloud projects add-iam-policy-binding [PROJECT-ID] \
+  --member=serviceAccount:cloudock-storage-writer@[PROJECT-ID].iam.gserviceaccount.com \
+  --role=roles/storage.objectCreator
+```
