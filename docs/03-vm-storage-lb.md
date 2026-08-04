@@ -173,12 +173,14 @@ this service account can add data but can't exfiltrate or destroy what's
 already there. This is the same least-privilege principle as the SSH
 firewall rule in M1, applied to IAM instead of network.
 
-## 4. Least-privilege service account
+## 5. Load balancer backend
 
 ```bash
-gcloud iam service-accounts create cloudock-storage-writer --display-name="Storage Writer SA"
+gcloud compute instance-groups unmanaged create cloudock-web-ig --zone=asia-southeast1-b
+gcloud compute instance-groups unmanaged add-instances cloudock-web-ig --instances=cloudock-webserver --zone=asia-southeast1-b
 
-gcloud projects add-iam-policy-binding [PROJECT-ID] \
-  --member=serviceAccount:cloudock-storage-writer@[PROJECT-ID].iam.gserviceaccount.com \
-  --role=roles/storage.objectCreator
+gcloud compute health-checks create http cloudock-http-health-check --port=80
+
+gcloud compute backend-services create cloudock-web-backend --health-checks=cloudock-http-health-check --global
+gcloud compute backend-services add-backend cloudock-web-backend --instance-group=cloudock-web-ig --instance-group-zone=asia-southeast1-b --global
 ```
