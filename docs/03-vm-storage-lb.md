@@ -184,11 +184,4 @@ gcloud compute health-checks create http cloudock-http-health-check --port=80
 gcloud compute backend-services create cloudock-web-backend --health-checks=cloudock-http-health-check --global
 gcloud compute backend-services add-backend cloudock-web-backend --instance-group=cloudock-web-ig --instance-group-zone=asia-southeast1-b --global
 ```
-**Why:** An *unmanaged* instance group is used here because there's a
-single, manually-created VM to register — no autoscaling or auto-healing
-needed for a one-instance test setup. Worth flagging as a deliberate
-simplification: a managed instance group (with an instance template) is
-the production-pattern equivalent, and would be the natural upgrade if
-this ever needs to scale past one VM. The health check's `--port=80`
-matches what nginx actually listens on — this only works because of the
-firewall rule added.
+**Why:** We are utilizing an unmanaged instance group deliberately as a simplified, static binding mechanism to attach a single, manually provisioned VM to the global backend service. While sufficient for a one-instance test setup, this approach explicitly sacrifices standard cloud resilience. By relying on an unmanaged group rather than the production standard—a Managed Instance Group (MIG) paired with a securely configured instance template—we establish a critical single point of failure. The configured HTTP health check (listening on `--port=80`, matching our established firewall rules) will successfully detect a service outage and sever the routing path, but the environment fundamentally lacks the automation required to terminate a degraded instance and deploy a healthy replacement. Ultimately, this architecture demonstrates the raw routing mechanics but remains entirely unsuited for production workloads where autoscaling and auto-healing are mandatory.
