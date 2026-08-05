@@ -185,3 +185,11 @@ gcloud compute backend-services create cloudock-web-backend --health-checks=clou
 gcloud compute backend-services add-backend cloudock-web-backend --instance-group=cloudock-web-ig --instance-group-zone=asia-southeast1-b --global
 ```
 **Why:** We are utilizing an unmanaged instance group deliberately as a simplified, static binding mechanism to attach a single, manually provisioned VM to the global backend service. While sufficient for a one-instance test setup, this approach explicitly sacrifices standard cloud resilience. By relying on an unmanaged group rather than the production standard—a Managed Instance Group (MIG) paired with a securely configured instance template—we establish a critical single point of failure. The configured HTTP health check (listening on `--port=80`, matching our established firewall rules) will successfully detect a service outage and sever the routing path, but the environment fundamentally lacks the automation required to terminate a degraded instance and deploy a healthy replacement. Ultimately, this architecture demonstrates the raw routing mechanics but remains entirely unsuited for production workloads where autoscaling and auto-healing are mandatory.
+
+## 6. Cloud Armor
+
+```bash
+gcloud compute security-policies create cloudock-armor-policy --description="Cloud Armor policy"
+gcloud compute backend-services update cloudock-web-backend --security-policy=cloudock-armor-policy --global
+```
+**Why:** Attaching this policy establishes the foundational enforcement point directly within the global routing path of the backend service. However, this initial deployment functions strictly as architectural scaffolding. By default, a newly created policy executes an "allow all" rule, meaning it currently provides zero active protection. Until it is explicitly configured with essential Web Application Firewall (WAF) controls—such as rate limiting, geo-fencing, and OWASP Top 10 rule sets—the application perimeter remains entirely exposed to malicious traffic. This step wires the plumbing to intercept requests, but the environment remains fundamentally unsecured until the actual defensive rules are defined and applied.
