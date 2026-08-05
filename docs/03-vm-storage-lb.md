@@ -228,7 +228,7 @@ confirming independently.
 | VM | `cloudock-webserver` | e2-micro, `cloudock-public-subnet`, tag `cloudock-web-server` |
 | Firewall | `cloudock-allow-http` | tcp:80, `0.0.0.0/0`, tag `cloudock-web-server` |
 | Firewall | `cloudock-allow-lb-health-check` | tcp:80, `130.211.0.0/22,35.191.0.0/16`, tag `cloudock-web-server` |
-| Bucket | `[PROJECT-ID]-security-assets` | uniform access, versioned, 90-day delete lifecycle, `asia-southeast1` |
+| Bucket | `cloudock-503009-security-assets` | uniform access, versioned, 90-day delete lifecycle, `asia-southeast1` |
 | Service account | `cloudock-storage-writer` | `roles/storage.objectCreator` only |
 | Instance group | `cloudock-web-ig` | unmanaged, `asia-southeast1-b` |
 | Health check | `cloudock-http-health-check` | HTTP, port 80 |
