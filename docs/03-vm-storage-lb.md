@@ -208,4 +208,5 @@ rule (the public IP + port) → target proxy (terminates HTTP) → URL map
 
 ## Resource View
 <img width="2928" height="316" alt="cloudock_lb" src="https://github.com/user-attachments/assets/5594b9e2-09eb-48b6-9d8f-c5f1b8ef1607" />
+<img width="1734" height="185" alt="image" src="https://github.com/user-attachments/assets/cf06ab79-a499-436b-810e-5a96135d38e3" />
 
