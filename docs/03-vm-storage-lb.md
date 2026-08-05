@@ -193,3 +193,15 @@ gcloud compute security-policies create cloudock-armor-policy --description="Clo
 gcloud compute backend-services update cloudock-web-backend --security-policy=cloudock-armor-policy --global
 ```
 **Why:** Attaching this policy establishes the foundational enforcement point directly within the global routing path of the backend service. However, this initial deployment functions strictly as architectural scaffolding. By default, a newly created policy executes an "allow all" rule, meaning it currently provides zero active protection. Until it is explicitly configured with essential Web Application Firewall (WAF) controls—such as rate limiting, geo-fencing, and OWASP Top 10 rule sets—the application perimeter remains entirely exposed to malicious traffic. This step wires the plumbing to intercept requests, but the environment remains fundamentally unsecured until the actual defensive rules are defined and applied.
+
+## 7. URL map, proxy, forwarding rule
+
+```bash
+gcloud compute url-maps create cloudock-web-map --default-service=cloudock-web-backend
+gcloud compute target-http-proxies create cloudock-http-proxy --url-map=cloudock-web-map
+gcloud compute forwarding-rules create cloudock-http-rule --global --target-http-proxy=cloudock-http-proxy --ports=80
+```
+**Why:** These three chain together the actual request path: forwarding
+rule (the public IP + port) → target proxy (terminates HTTP) → URL map
+(routing logic, here just "everything to one backend") → backend service
+→ health-checked instance group.
