@@ -209,3 +209,43 @@ rule (the public IP + port) → target proxy (terminates HTTP) → URL map
 ## Resource View
 <img width="2928" height="316" alt="IMG_20260805_163819" src="https://github.com/user-attachments/assets/61e171ea-ccd9-4234-ba50-e35cbb796cf3" />
 
+## Verification
+
+```bash
+gcloud compute forwarding-rules list
+gcloud compute backend-services get-health cloudock-web-backend --global
+```
+**Why:** The forwarding rule's IP is where you actually test in a browser.
+`get-health` is the check worth running even if the browser test passes —
+it confirms the health check specifically sees the backend as HEALTHY,
+which is the thing that was silently broken before the firewall fix. 
+A page loading and a backend reporting healthy are both worth
+confirming independently.
+## Infrastructure reference
+
+| Resource | Name | Details |
+|---|---|---|
+| VM | `cloudock-webserver` | e2-micro, `cloudock-public-subnet`, tag `cloudock-web-server` |
+| Firewall | `cloudock-allow-http` | tcp:80, `0.0.0.0/0`, tag `cloudock-web-server` |
+| Firewall | `cloudock-allow-lb-health-check` | tcp:80, `130.211.0.0/22,35.191.0.0/16`, tag `cloudock-web-server` |
+| Bucket | `[PROJECT-ID]-security-assets` | uniform access, versioned, 90-day delete lifecycle, `asia-southeast1` |
+| Service account | `cloudock-storage-writer` | `roles/storage.objectCreator` only |
+| Instance group | `cloudock-web-ig` | unmanaged, `asia-southeast1-b` |
+| Health check | `cloudock-http-health-check` | HTTP, port 80 |
+| Backend service | `cloudock-web-backend` | global, health-checked |
+| Cloud Armor policy | `cloudock-armor-policy` | attached, default rule only (no custom rules yet) |
+| URL map | `cloudock-web-map` | default service → `cloudock-web-backend` |
+| Target proxy | `cloudock-http-proxy` | HTTP |
+| Forwarding rule | `cloudock-http-rule` | global, port 80 |
+
+## Decision log
+- Unmanaged instance group used deliberately for a single-VM setup —
+  managed instance group + template is the natural next step if this
+  scales past one instance.
+- Cloud Armor policy attached with no custom rules yet — enforcement point
+  exists, protection doesn't. Follow-up work, not forgotten.
+- Storage lifecycle set to 90 days as a cost control, not a retention
+  policy — revisit if this bucket ever needs to hold anything for longer.
+- Both firewall gaps (HTTP port, LB health-check ranges) caught and fixed
+  before running the plan, rather than discovered after a failed browser
+  test or a stuck-UNHEALTHY backend.
