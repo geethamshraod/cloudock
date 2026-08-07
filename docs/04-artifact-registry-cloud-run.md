@@ -68,13 +68,7 @@ gcloud run deploy cloudock-dashboard \
   --service-account=cloudock-run-sa@cloudock-503009.iam.gserviceaccount.com \
   --port=8080
 ```
-**Why:** `--allow-unauthenticated` is a deliberate choice, not a default
-left on accident — this is a public-facing demo dashboard, same reasoning
-as `cloudock-allow-http` being open in M2. `--min-instances=0` lets it
-scale to zero when idle, in keeping with the $0 budget approach from day
-one. `--port=8080` matches both the Dockerfile's `EXPOSE 8080` and the
-Flask app's `app.run(host="0.0.0.0", port=8080)` — Cloud Run defaults to
-8080 anyway, so this flag is redundant in practice but makes the
+**Why:** Explicitly defining parameters like `--allow-unauthenticated` enables intentional public ingress for the dashboard, while `--min-instances=0` enforces a highly cost-optimized, scale-to-zero (scale to zero when idle) operational model. Furthermore, explicitly declaring the port mapping guarantees strict alignment between the Cloud Run runtime environment and the internal Flask application listener. `--port=8080` matches both the Dockerfile's `EXPOSE 8080`, `app.run(host="0.0.0.0", port=8080)` this flag is redundant in practice but makes the
 assumption explicit rather than implicit.
 
 **If this errors with a permission/actAs message:** deploying *with* a
@@ -85,7 +79,7 @@ personal-account Owner setup, but if it does:
 gcloud iam service-accounts add-iam-policy-binding cloudock-run-sa@cloudock-503009.iam.gserviceaccount.com --member="user:geethamshraodharbasth@gmail.com" --role="roles/iam.serviceAccountUser"
 ```
 
-## 7. Get the URL, test it
+## 7. Getting the URL, testing it
 ```bash
 gcloud run services describe secure-dashboard --region=asia-southeast1 --format="get(status.url)"
 ```
