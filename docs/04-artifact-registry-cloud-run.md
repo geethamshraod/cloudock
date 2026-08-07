@@ -1,7 +1,7 @@
-# M3 — Artifact Registry + Cloud Run Deploy (Notes)
+# M3 — Artifact Registry + Cloud Run Deploy 
 
 **Goal:** Push the Flask dashboard image to Artifact Registry, then deploy it to Cloud Run behind a
-purpose-built service account — not the default compute SA.
+purpose-built service account — not the default compute SA to establish the principle of least privilege.
 
 ## 1. Local test
 ```bash
