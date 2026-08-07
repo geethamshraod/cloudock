@@ -3,7 +3,7 @@
 **Goal:** Push the Flask dashboard image to Artifact Registry, then deploy it to Cloud Run behind a
 purpose-built service account — not the default compute SA to establish the principle of least privilege.
 
-%%Creating a dedicated, minimal-permission service account specifically for the Cloud Run instance strictly adheres to the principle of least privilege by avoiding the over-permissioned default compute identity.%%
+<!--Creating a dedicated, minimal-permission service account specifically for the Cloud Run instance strictly adheres to the principle of least privilege by avoiding the over-permissioned default compute identity.-->
 
 ## 1. Local test
 ```bash
