@@ -20,7 +20,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
 
 resource "google_service_account_iam_member" "github_wif" {
   service_account_id = google_service_account.cloud_run_sa.name
-  role                = "roles/iam.workloadIdentityUser"
+  role               = "roles/iam.workloadIdentityUser"
   # Fixed: original hardcoded the pre-rename repo name "secure-cloud-ops".
   # GitHub's OIDC token asserts the CURRENT repo name ("cloudock"), so a
   # condition still checking for the old name would never match --

@@ -76,10 +76,11 @@ resource "google_compute_firewall" "allow_lb_health_check" {
 }
 
 resource "google_compute_firewall" "deny_all" {
-  name      = "cloudock-deny-all-ingress"
-  network   = google_compute_network.vpc.name
-  direction = "INGRESS"
-  priority  = 65534
+  name          = "cloudock-deny-all-ingress"
+  network       = google_compute_network.vpc.name
+  direction     = "INGRESS"
+  priority      = 65534
+  source_ranges = ["0.0.0.0/0"]
 
   deny {
     protocol = "all"
