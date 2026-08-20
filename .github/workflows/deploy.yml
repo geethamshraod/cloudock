@@ -19,8 +19,8 @@ jobs:
       - name: Authenticate to GCP (keyless via WIF)
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "projects/[NUM]/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
-          service_account: "cloud-run-sa@[PROJECT].iam.gserviceaccount.com"
+          workload_identity_provider: "projects/785831511320/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "cloud-run-sa@cloudock-503009.iam.gserviceaccount.com"
 
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
@@ -55,8 +55,8 @@ jobs:
       - name: Push to Artifact Registry
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          docker tag secure-dashboard:${{ github.sha }} asia-southeast1-docker.pkg.dev/[PROJECT]/secure-apps/secure-dashboard:${{ github.sha }}
-          docker push asia-southeast1-docker.pkg.dev/[PROJECT]/secure-apps/secure-dashboard:${{ github.sha }}
+          docker tag secure-dashboard:${{ github.sha }} asia-southeast1-docker.pkg.dev/cloudock-503009/secure-apps/secure-dashboard:${{ github.sha }}
+          docker push asia-southeast1-docker.pkg.dev/cloudock-503009/secure-apps/secure-dashboard:${{ github.sha }}
 
   deploy:
     needs: security-scan
@@ -70,11 +70,11 @@ jobs:
       - name: Authenticate to GCP (keyless via WIF)
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: "projects/[NUM]/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
-          service_account: "cloud-run-sa@[PROJECT].iam.gserviceaccount.com"
+          workload_identity_provider: "projects/785831511320/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "cloud-run-sa@cloudock-503009.iam.gserviceaccount.com"
 
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy to Cloud Run
-        run: gcloud run deploy secure-dashboard --image=asia-southeast1-docker.pkg.dev/[PROJECT]/secure-apps/secure-dashboard:${{ github.sha }} --region=asia-southeast1
+        run: gcloud run deploy secure-dashboard --image=asia-southeast1-docker.pkg.dev/cloudock-503009/secure-apps/secure-dashboard:${{ github.sha }} --region=asia-southeast1
