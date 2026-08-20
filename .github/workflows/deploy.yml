@@ -1,0 +1,80 @@
+name: Secure Deploy Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for WIF
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (keyless via WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/[NUM]/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "cloud-run-sa@[PROJECT].iam.gserviceaccount.com"
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Checkov IaC Security Scan
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: terraform/
+          soft_fail: false
+          quiet: false
+
+      - name: Build Docker image
+        run: docker build -t secure-dashboard:${{ github.sha }} ./app
+
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: "secure-dashboard:${{ github.sha }}"
+          exit-code: "1"
+          severity: "CRITICAL"
+          format: "table"
+
+      # Only push on an actual merge to main -- PR runs scan and stop here.
+      # Pushing here (not in "deploy") is what lets the image built and
+      # scanned in THIS job actually be usable by the deploy job, which
+      # runs on a separate, fresh runner with no access to this one's
+      # local Docker images.
+      - name: Configure Docker for Artifact Registry
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: gcloud auth configure-docker asia-southeast1-docker.pkg.dev --quiet
+
+      - name: Push to Artifact Registry
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          docker tag secure-dashboard:${{ github.sha }} asia-southeast1-docker.pkg.dev/[PROJECT]/secure-apps/secure-dashboard:${{ github.sha }}
+          docker push asia-southeast1-docker.pkg.dev/[PROJECT]/secure-apps/secure-dashboard:${{ github.sha }}
+
+  deploy:
+    needs: security-scan
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required again -- permissions don't carry across jobs
+
+    steps:
+      - name: Authenticate to GCP (keyless via WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/[NUM]/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "cloud-run-sa@[PROJECT].iam.gserviceaccount.com"
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: gcloud run deploy secure-dashboard --image=asia-southeast1-docker.pkg.dev/[PROJECT]/secure-apps/secure-dashboard:${{ github.sha }} --region=asia-southeast1
