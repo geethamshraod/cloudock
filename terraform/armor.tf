@@ -2,7 +2,7 @@
 # explicitly flagged in that milestone's decision log as unfinished work.
 # This is that follow-up.
 resource "google_compute_security_policy" "cloudock" {
-  name = "armor-policy"
+  name = "cloudock-armor-policy"
 
   rule {
     priority    = 1000
@@ -65,7 +65,7 @@ resource "google_compute_security_policy" "cloudock" {
     description = "Block scanners"
     match {
       expr {
-        expression = "evaluatePreconfiguredExpr('scanner-detection-stable')"
+        expression = "evaluatePreconfiguredExpr('scannerdetection-stable')"
       }
     }
   }
