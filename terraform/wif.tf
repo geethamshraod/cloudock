@@ -4,6 +4,7 @@ resource "google_iam_workload_identity_pool" "github" {
 }
 
 resource "google_iam_workload_identity_pool_provider" "github" {
+  #checkov:skip=CKV_GCP_125:This check only recognizes conditions written against assertion.sub in exact "repo:org/repo:..." form. Our condition (below) restricts on assertion.repository instead -- a legitimate, custom-mapped claim that CKV_GCP_118 (passing) checks for. assertion.sub's exact value differs between push and pull_request events, so an exact-match sub condition would only ever authenticate one of the two triggers this pipeline needs (scan-on-PR and deploy-on-push) -- narrowing to satisfy this check would break one of them.
   workload_identity_pool_id          = google_iam_workload_identity_pool.github.workload_identity_pool_id
   workload_identity_pool_provider_id = "github-provider"
 
