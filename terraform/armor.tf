@@ -71,6 +71,17 @@ resource "google_compute_security_policy" "cloudock" {
   }
 
   rule {
+    priority    = 1006
+    action      = "deny(403)"
+    description = "Block Log4Shell (CVE-2021-44228)"
+    match {
+      expr {
+        expression = "evaluatePreconfiguredExpr('cve-canary')"
+      }
+    }
+  }
+
+  rule {
     priority    = 2147483647
     action      = "allow"
     description = "Default allow"
