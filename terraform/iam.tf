@@ -13,6 +13,6 @@ resource "google_project_iam_member" "firestore_access" {
 # a different name (cloudock-storage-writer). Consolidated here using the
 # literal name, matching what M2 actually appears to have created.
 resource "google_service_account" "storage_sa" {
-  account_id   = "storage-writer"
+  account_id   = "cloudock-storage-writer"
   display_name = "Storage Writer SA"
 }

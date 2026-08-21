@@ -4,9 +4,11 @@
 # purpose. Only one should exist in the real project.
 
 resource "google_storage_bucket" "security_assets" {
+  #checkov:skip=CKV_GCP_62:Access logging requires a separate log-sink bucket -- valid follow-up, not implemented this round
   name                        = "${var.project_id}-security-assets"
   location                    = var.region
   uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
 
   versioning {
     enabled = true

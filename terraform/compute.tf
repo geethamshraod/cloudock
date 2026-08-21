@@ -5,10 +5,13 @@ resource "google_service_account" "web_sa" {
 }
 
 resource "google_compute_instance" "webserver" {
-  name         = "cloudock-webserver"
-  machine_type = "e2-micro"
-  zone         = var.zone
-  tags         = ["web-server"]
+  #checkov:skip=CKV_GCP_38:Google-managed disk encryption is the default and adequate here -- CSEK adds KMS key-management complexity not warranted for this project's scope
+  #checkov:skip=CKV_GCP_40:Intentional -- this is the project's public web tier, meant to be reachable directly
+  name                      = "cloudock-webserver"
+  machine_type              = "e2-micro"
+  zone                      = var.zone
+  tags                      = ["web-server"]
+  allow_stopping_for_update = true
 
   boot_disk {
     initialize_params {
@@ -22,7 +25,14 @@ resource "google_compute_instance" "webserver" {
   }
 
   metadata = {
-    ssh-keys = "user:${var.ssh_public_key}"
+    ssh-keys                = "user:${var.ssh_public_key}"
+    block-project-ssh-keys  = "true"
+  }
+
+  shielded_instance_config {
+    enable_secure_boot          = true
+    enable_vtpm                 = true
+    enable_integrity_monitoring = true
   }
 
   service_account {

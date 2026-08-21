@@ -4,17 +4,31 @@ resource "google_compute_network" "vpc" {
 }
 
 resource "google_compute_subnetwork" "public" {
-  name          = "cloudock-public-subnet"
-  ip_cidr_range = "10.0.1.0/24"
-  region        = var.region
-  network       = google_compute_network.vpc.id
+  name                     = "cloudock-public-subnet"
+  ip_cidr_range            = "10.0.1.0/24"
+  region                   = var.region
+  network                  = google_compute_network.vpc.id
+  private_ip_google_access = true
+
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 resource "google_compute_subnetwork" "private" {
-  name          = "cloudock-private-subnet"
-  ip_cidr_range = "10.0.2.0/24"
-  region        = var.region
-  network       = google_compute_network.vpc.id
+  name                     = "cloudock-private-subnet"
+  ip_cidr_range            = "10.0.2.0/24"
+  region                   = var.region
+  network                  = google_compute_network.vpc.id
+  private_ip_google_access = true
+
+  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 resource "google_compute_firewall" "allow_ssh" {
@@ -54,7 +68,23 @@ resource "google_compute_firewall" "allow_https" {
 
   allow {
     protocol = "tcp"
-    ports    = ["443", "80"]
+    ports    = ["443"]
+  }
+}
+
+# Split from allow_https -- gcloud firewall-rules list confirms these exist
+# as two separate live rules, not one combined 443+80 rule as originally
+# written here.
+resource "google_compute_firewall" "allow_http" {
+  #checkov:skip=CKV_GCP_106:Intentional -- this is the project's public web tier, meant to be reachable on port 80 from anywhere
+  name          = "cloudock-allow-http"
+  network       = google_compute_network.vpc.name
+  direction     = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["80"]
   }
 }
 

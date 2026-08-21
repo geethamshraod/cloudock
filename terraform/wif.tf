@@ -7,6 +7,13 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   workload_identity_pool_id          = google_iam_workload_identity_pool.github.workload_identity_pool_id
   workload_identity_pool_provider_id = "github-provider"
 
+  # Required by Google as of a recent platform-wide policy change -- a
+  # provider can no longer be created without an explicit condition
+  # restricting which tokens it accepts. This also happens to be the
+  # tighter WIF scoping flagged as optional hardening in the CI/CD notes;
+  # now it's mandatory either way.
+  attribute_condition = "assertion.repository == \"${var.github_user}/${var.github_repo}\""
+
   attribute_mapping = {
     "google.subject"       = "assertion.sub"
     "attribute.repository" = "assertion.repository"
@@ -20,7 +27,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
 
 resource "google_service_account_iam_member" "github_wif" {
   service_account_id = google_service_account.cloud_run_sa.name
-  role               = "roles/iam.workloadIdentityUser"
+  role                = "roles/iam.workloadIdentityUser"
   # Fixed: original hardcoded the pre-rename repo name "secure-cloud-ops".
   # GitHub's OIDC token asserts the CURRENT repo name ("cloudock"), so a
   # condition still checking for the old name would never match --
@@ -49,8 +56,12 @@ resource "google_project_iam_member" "cicd_artifact_writer" {
   member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
 }
 
-resource "google_project_iam_member" "cicd_sa_user" {
-  project = var.project_id
-  role    = "roles/iam.serviceAccountUser"
-  member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
+# Replaces a project-wide serviceAccountUser grant -- Checkov correctly
+# flagged that as letting cloud-run-sa impersonate ANY service account in
+# the project. This scopes it to only itself, which is all `gcloud run
+# deploy --service-account=cloud-run-sa` actually needs.
+resource "google_service_account_iam_member" "cicd_sa_user" {
+  service_account_id = google_service_account.cloud_run_sa.name
+  role                = "roles/iam.serviceAccountUser"
+  member              = "serviceAccount:${google_service_account.cloud_run_sa.email}"
 }
