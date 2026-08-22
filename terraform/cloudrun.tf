@@ -1,4 +1,5 @@
 resource "google_artifact_registry_repository" "secure_apps" {
+  #checkov:skip=CKV_GCP_84:Google-managed encryption is the default and adequate here -- CSEK adds KMS key-management complexity not warranted for this project's scope
   location      = var.region
   repository_id = "secure-apps"
   format        = "DOCKER"

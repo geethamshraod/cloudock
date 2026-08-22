@@ -25,7 +25,7 @@ resource "google_monitoring_uptime_check_config" "cloudock" {
 
 resource "google_monitoring_alert_policy" "error_rate" {
   display_name = "cloudock-error-rate-alert"
-  combiner      = "OR"
+  combiner     = "OR"
 
   conditions {
     display_name = "5xx error rate"

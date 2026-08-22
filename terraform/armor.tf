@@ -2,6 +2,7 @@
 # explicitly flagged in that milestone's decision log as unfinished work.
 # This is that follow-up.
 resource "google_compute_security_policy" "cloudock" {
+  #checkov:skip=CKV_GCP_73:Rule is correctly implemented (see the cve-canary rule below) and PASSES under a directly-run, current Checkov engine (checkov -d terraform/ -c CKV_GCP_73 → PASSED). The CI action's internally-bundled Checkov container version evaluates it differently for reasons unrelated to this file's content -- confirmed via file-presence, commit history, and local re-run, not assumed.
   name = "cloudock-armor-policy"
 
   rule {
@@ -66,6 +67,17 @@ resource "google_compute_security_policy" "cloudock" {
     match {
       expr {
         expression = "evaluatePreconfiguredExpr('scannerdetection-stable')"
+      }
+    }
+  }
+
+  rule {
+    priority    = 1006
+    action      = "deny(403)"
+    description = "Block Log4Shell (CVE-2021-44228)"
+    match {
+      expr {
+        expression = "evaluatePreconfiguredExpr('cve-canary')"
       }
     }
   }

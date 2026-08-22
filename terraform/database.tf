@@ -1,5 +1,5 @@
 resource "google_firestore_database" "default" {
-  name        = "(default)"
+  name = "(default)"
   # Corrected from the task's us-central1 -- the real Firestore database
   # was created in asia-southeast1 during the M4 crash-loop fix, and
   # Firestore location is permanent once set. This resource must be
