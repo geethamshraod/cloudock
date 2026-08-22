@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Authenticate to GCP (keyless via WIF)
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: "projects/785831511320/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
           service_account: "cloud-run-sa@cloudock-503009.iam.gserviceaccount.com"
@@ -68,7 +68,7 @@ jobs:
 
     steps:
       - name: Authenticate to GCP (keyless via WIF)
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: "projects/785831511320/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
           service_account: "cloud-run-sa@cloudock-503009.iam.gserviceaccount.com"
