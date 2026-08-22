@@ -25,8 +25,8 @@ resource "google_compute_instance" "webserver" {
   }
 
   metadata = {
-    ssh-keys                = "user:${var.ssh_public_key}"
-    block-project-ssh-keys  = "true"
+    ssh-keys               = "user:${var.ssh_public_key}"
+    block-project-ssh-keys = "true"
   }
 
   shielded_instance_config {

@@ -1,0 +1,11 @@
+# perl-base is not used by this Flask application -- it's an unused
+# transitive dependency of the python:3.11-slim base image, not something
+# this app's code ever invokes. Two of these three CVEs have no upstream
+# fix available yet (status: affected, no Fixed Version); the third's fix
+# is deferred by Debian maintainers, not released. Documented exception,
+# same pattern as the Checkov skips elsewhere in this project -- prefer
+# the Dockerfile fix (removing the package outright) over relying on this
+# file; this exists as a fallback if that ever needs to be reverted.
+CVE-2026-13221
+CVE-2026-42496
+CVE-2026-8376
