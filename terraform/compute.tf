@@ -6,7 +6,6 @@ resource "google_service_account" "web_sa" {
 
 resource "google_compute_instance" "webserver" {
   #checkov:skip=CKV_GCP_38:Google-managed disk encryption is the default and adequate here -- CSEK adds KMS key-management complexity not warranted for this project's scope
-  #checkov:skip=CKV_GCP_40:Intentional -- this is the project's public web tier, meant to be reachable directly
   name                      = "cloudock-webserver"
   machine_type              = "e2-micro"
   zone                      = var.zone
@@ -21,12 +20,16 @@ resource "google_compute_instance" "webserver" {
 
   network_interface {
     subnetwork = google_compute_subnetwork.public.id
-    access_config {} # ephemeral external IP
+    # No access_config -- removed per SCC finding "Public IP address"
+    # (HIGH). The VM is reachable via the load balancer (Cloud Armor
+    # protected) for HTTP, and via the IAP tunnel (cloudock-allow-iap-ssh)
+    # for SSH -- neither needs a public IP. Cloud NAT covers all subnets
+    # in the VPC, so outbound access (apt/package updates) is unaffected.
   }
 
   metadata = {
-    ssh-keys               = "user:${var.ssh_public_key}"
-    block-project-ssh-keys = "true"
+    ssh-keys                = "user:${var.ssh_public_key}"
+    block-project-ssh-keys  = "true"
   }
 
   shielded_instance_config {
