@@ -86,7 +86,6 @@ confirmed — update this number once checked. -->
 | `docs/05-firestore-secret-manager.md` | M4 — Firestore, Secret Manager |
 | `docs/06-terraform-infrastructure-as-code.md` | M5 — full IaC |
 | `docs/07-cicd-pipeline.md` | M6 — GitHub Actions pipeline setup |
-<!-- | `docs/08-cicd-troubleshooting-resolution.md` | Real issues hit and fixed getting CI/CD working | -->
 | `docs/08-monitoring-armor-flowlogs-scc.md` | M7 — monitoring, WAF, flow logs, SCC |
 | `THREAT_MODEL.md` | STRIDE analysis |
 | `SECURITY_DESIGN.md` | Architectural decisions and trade-offs |
@@ -103,7 +102,6 @@ authenticated via Workload Identity Federation. See
 ## Infrastructure as Code
 
 All infrastructure is defined in `terraform/`. See
-<!-- `terraform/README.md` for setup, and -->
 `docs/06-terraform-infrastructure-as-code.md` for the complete
 reference, including the import process used to reconcile Terraform
 with infrastructure originally built by hand.
