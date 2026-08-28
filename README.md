@@ -105,3 +105,9 @@ All infrastructure is defined in `terraform/`. See
 `docs/06-terraform-infrastructure-as-code.md` for the complete
 reference, including the import process used to reconcile Terraform
 with infrastructure originally built by hand.
+
+## Access the URL
+```bash
+gcloud run services describe cloudock-dashboard --region=asia-southeast1 --format="get(status.url)"
+```
+Here we are using the Cloud Run / Load Balancer URL for accessing the application because the actual VM no longer has a public IP at all i.e., that was removed specifically to close the Security Command Center findings. The load balancer is now the only public entry point to that application track and also, the load balancer sits behind Cloud Armor, every request gets inspected against the OWASP Top 10 + Log4Shell rules before it reaches anything. Hitting the VM's IP directly (when it existed) bypassed that inspection entirely with the same backend, zero WAF coverage.
